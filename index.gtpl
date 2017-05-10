@@ -49,20 +49,20 @@
             <div className="container">
               <table className="table">
                 <thead><tr>
-                  <th>Host</th>
-                  <th>Unique Count</th>
-                  <th>MinDate</th>
-                  <th>MaxDate</th>
+                  <th className="text-center">Host</th>
+                  <th className="text-center">Unique Count</th>
+                  <th className="text-center">MinDate</th>
+                  <th className="text-center">MaxDate</th>
                 </tr></thead>
                 <tbody>
                   {
                     this.state.hosts.map(function(host){
                       return (
                         <tr>
-                          <td>{host.host}</td>
-                          <td>{host.url_count}</td>
-                          <td>{host.mindate}</td>
-                          <td>{host.maxdate}</td>
+                          <td>{host.Host}</td>
+                          <td>{host.Url}</td>
+                          <td>{host.Mindate}</td>
+                          <td>{host.Maxdate}</td>
                         </tr>
                       )
                   })
@@ -79,14 +79,13 @@
           })
         },
         formSubmit: function(event){
-          event.stopPropagation();
+          event.preventDefault();
           $.ajax({
             url: '/fetch?key='+ this.state.this_host,
             type: 'GET',
             success: function(data){
-              data.host = this.state.this_host;
               this.setState(function(prevState){
-                hosts: prevState.hosts.concat([data])
+                return {hosts: prevState.hosts.concat([data])}
               })
             }.bind(this)
           })

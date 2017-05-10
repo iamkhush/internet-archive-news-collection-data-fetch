@@ -18,9 +18,10 @@ import (
 var db *sql.DB
 
 type HostData struct {
-    urls int
-    mindate string
-    maxdate string
+    Host string
+    Url int
+    Mindate string
+    Maxdate string
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -40,21 +41,26 @@ func Fetchhandler(w http.ResponseWriter, r *http.Request){
     if r.Method == "GET" {
         key := r.FormValue("key")
         fmt.Println(key)
-        err := db.QueryRow("select urls, mindate, maxdate from hosts where host=?", key).Scan(&urls, &mindate, &maxdate)
+        err := db.QueryRow("select urls, mindate, maxdate from hosts where host=$1", key).Scan(&urls, &mindate, &maxdate)
         if err != nil {
-            fmt.Println(err)
             log.Fatal(err)
         }
 
-        fmt.Println(urls, mindate, maxdate)
+        fmt.Println(urls, mindate, maxdate, len(s.Split(urls, ";")))
 
-        thisHost := HostData{len(s.Split(urls, ";")), mindate, maxdate}
+        thisHost := &HostData{
+            Host: key, 
+            Url:  len(s.Split(urls, ";")),
+            Mindate: mindate,
+            Maxdate: maxdate,
+        }
 
         js, err := json.Marshal(thisHost)
         if err != nil {
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
         }
+        fmt.Println(string(js))
         w.Header().Set("Content-Type", "application/json")
         w.Write(js)
     }
@@ -63,7 +69,8 @@ func Fetchhandler(w http.ResponseWriter, r *http.Request){
 func main() {
     argsWithoutProg := os.Args[1:]
     fmt.Println(argsWithoutProg)
-    db, err := sql.Open("postgres", s.Join(argsWithoutProg,""))
+    var err error
+    db, err = sql.Open("postgres", s.Join(argsWithoutProg," "))
     if  err!= nil {
        log.Fatal(err)
     }
