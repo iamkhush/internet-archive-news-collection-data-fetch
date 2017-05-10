@@ -42,8 +42,12 @@ func Fetchhandler(w http.ResponseWriter, r *http.Request){
         key := r.FormValue("key")
         fmt.Println(key)
         err := db.QueryRow("select urls, mindate, maxdate from hosts where host=$1", key).Scan(&urls, &mindate, &maxdate)
-        if err != nil {
-            log.Fatal(err)
+        switch {
+            case err == sql.ErrNoRows:
+                http.Error(w, err.Error(), http.StatusInternalServerError)
+                return
+            case err != nil:
+                log.Fatal(err)
         }
 
         fmt.Println(urls, mindate, maxdate, len(s.Split(urls, ";")))
