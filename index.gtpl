@@ -46,7 +46,7 @@
               <div className="container">
                 <form action="#" method="GET" onSubmit={this.formSubmit}>
                   <input type="text" name="key" className="form-control" placeholder="Enter the host name." onChange={this.handleChange} />
-                  <button type="submit" className={this.state.fetching ? "btn btn-primary disabled": "btn btn-primary"} onClick={this.formSubmit}>Submit <i className={this.state.fetching ? "fa fa-spinner fa-spin": ""} /></button> 
+                  <button type="submit" className={this.state.fetching?"btn btn-primary disabled":"btn btn-primary"} onClick={this.formSubmit}>Submit <i className={this.state.fetching?"fa fa-spinner fa-spin":""} /></button> 
                 </form>
               </div>
             </div>
@@ -61,12 +61,16 @@
                 <tbody>
                   {
                     this.state.hosts.map(function(host){
+                      var min = host.Mindate.substr(0,4) + '-' + host.Mindate.substr(4,2) + '-' +
+                      host.Mindate.substr(6,2);
+                      var max = host.Maxdate.substr(0,4) + '-' + host.Maxdate.substr(4,2) + '-' +
+                      host.Maxdate.substr(6,2);
                       return (
                         <tr>
                           <td>{host.Host}</td>
                           <td>{host.Url}</td>
-                          <td>{host.Mindate}</td>
-                          <td>{host.Maxdate}</td>
+                          <td>{min}</td>
+                          <td>{max}</td>
                         </tr>
                       )
                   })
