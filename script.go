@@ -23,10 +23,8 @@ type HostData struct {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-    if r.Method == "GET" {
-        t, _ := template.ParseFiles("index.gtpl")
-        t.Execute(w, nil)
-    }
+    t, _ := template.ParseFiles("index.gtpl")
+    t.Execute(w, nil)
 }
 
 func Fetchhandler(w http.ResponseWriter, r *http.Request){
