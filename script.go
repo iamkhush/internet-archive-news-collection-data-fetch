@@ -1,5 +1,3 @@
-// user=achadda password=achadda123 dbname=hosts
-
 // run the program with conn. string like "user=iamkhush password=iamkhush dbname=dbname"
 package main
 
