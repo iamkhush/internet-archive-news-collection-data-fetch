@@ -42,6 +42,7 @@
             <div className="App-header">
               <h2>Welcome to News Data Fetcher App</h2>
             </div>
+            <div className="text-center">Approx Unique Host Count is {{.}}</div>
             <div className="form-group">
               <div className="container">
                 <form action="#" method="GET" onSubmit={this.formSubmit}>

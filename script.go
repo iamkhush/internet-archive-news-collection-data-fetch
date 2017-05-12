@@ -23,8 +23,13 @@ type HostData struct {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
+    var count uint64
+    err := db.QueryRow("SELECT reltuples::bigint AS estimate FROM pg_class where relname='hosts'").Scan(&count)
+    if err != nil {
+        log.Fatal(err)
+    }
     t, _ := template.ParseFiles("index.gtpl")
-    t.Execute(w, nil)
+    t.Execute(w, count)
 }
 
 func Fetchhandler(w http.ResponseWriter, r *http.Request){
