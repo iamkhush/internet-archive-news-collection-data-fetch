@@ -75,7 +75,15 @@ var App = React.createClass({
       type: 'GET',
       success: function(data){
         this.setState(function(prevState){
-          return {hosts: prevState.hosts.concat([data]), fetching: false, data: data.UrlCount}
+          modUrlCount = data.UrlCount.map(function(eachDict){
+            eachDict['count'] = parseInt(eachDict['count']);
+            return eachDict;
+          })
+          return {
+            hosts: prevState.hosts.concat([data]),
+            fetching: false, 
+            data: modUrlCount
+          }
         })
       }.bind(this),
       error: function(data){
