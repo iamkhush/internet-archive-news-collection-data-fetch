@@ -20,92 +20,14 @@
     </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script src="//unpkg.com/react@15/dist/react.min.js"></script>
-    <script src="//unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
-    <script src="//unpkg.com/babel-standalone@6/babel.min.js"></script>    
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
-      
-    </script>
-    <script type="text/babel">
-      var App = React.createClass({    
-        getInitialState: function() {
-          return {
-            hosts: [],
-            this_host: '',
-            fetching: false
-          }
-        },
-        render: function() {
-          return (
-          <div className="App">
-            <div className="App-header">
-              <h2>Welcome to News Data Fetcher App</h2>
-            </div>
-            <div className="text-center">Approx Unique Host Count is {{.}}</div>
-            <div className="form-group">
-              <div className="container">
-                <form action="#" method="GET" onSubmit={this.formSubmit}>
-                  <input type="text" name="key" className="form-control" placeholder="Enter the host name." onChange={this.handleChange} />
-                  <button type="submit" className={this.state.fetching?"btn btn-primary disabled":"btn btn-primary"} onClick={this.formSubmit}>Submit <i className={this.state.fetching?"fa fa-spinner fa-spin":""} /></button> 
-                </form>
-              </div>
-            </div>
-            <div className="container">
-              <table className="table">
-                <thead><tr>
-                  <th className="text-center">Host</th>
-                  <th className="text-center">Unique Count</th>
-                  <th className="text-center">MinDate</th>
-                  <th className="text-center">MaxDate</th>
-                </tr></thead>
-                <tbody>
-                  {
-                    this.state.hosts.map(function(host){
-                      var min = host.Mindate.substr(0,4) + '-' + host.Mindate.substr(4,2) + '-' +
-                      host.Mindate.substr(6,2);
-                      var max = host.Maxdate.substr(0,4) + '-' + host.Maxdate.substr(4,2) + '-' +
-                      host.Maxdate.substr(6,2);
-                      return (
-                        <tr>
-                          <td>{host.Host}</td>
-                          <td>{host.Url}</td>
-                          <td>{min}</td>
-                          <td>{max}</td>
-                        </tr>
-                      )
-                  })
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-          );
-        },
-        handleChange: function(e) {
-          this.setState({
-            this_host: e.target.value
-          })
-        },
-        formSubmit: function(event){
-          this.setState({fetching: true});
-          event.preventDefault();
-          $.ajax({
-            url: '/fetch?key='+ this.state.this_host,
-            type: 'GET',
-            success: function(data){
-              this.setState(function(prevState){
-                return {hosts: prevState.hosts.concat([data]), fetching: false}
-              })
-            }.bind(this),
-            error: function(data){
-              alert('Looks like we havent parsed '+this.state.this_host+' yet.')
-              this.setState({fetching: false});
-            }.bind(this)
-          })
-        }
-      });
-    ReactDOM.render(<App />, document.getElementById('root'));
-    </script>
+    
+    <div class="App">
+      <div class="App-header">
+        <h2>Welcome to News Data Fetcher App</h2>
+      </div>
+      <div class="text-center">Approx Unique Host Count is {{.}}</span></div>
+      <div id="root"></div>
+    </div>
+    <script src="/dist/bundle.js"></script>
   </body>
 </html>

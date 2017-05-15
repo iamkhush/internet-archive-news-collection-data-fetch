@@ -11,6 +11,7 @@ import (
         _ "github.com/lib/pq"
         "html/template"
         "encoding/json"
+        "strconv"
 )
 
 var db *sql.DB
@@ -20,19 +21,40 @@ type HostData struct {
     Url int
     Mindate string
     Maxdate string
+    UrlCount []map[string]string
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-    var count uint64
-    err := db.QueryRow("SELECT reltuples::bigint AS estimate FROM pg_class where relname='hosts'").Scan(&count)
+    var rowcount uint64
+    err := db.QueryRow("SELECT reltuples::bigint AS estimate FROM pg_class where relname='hosts'").Scan(&rowcount)
     if err != nil {
         log.Fatal(err)
     }
     t, _ := template.ParseFiles("index.gtpl")
-    t.Execute(w, count)
+    t.Execute(w, rowcount)
 }
 
-func Fetchhandler(w http.ResponseWriter, r *http.Request){
+func checkOrAppend(item string, list []map[string]string) []map[string]string {
+    isPresent := false
+    for _, b := range list {
+        if b["key"] == item {
+            count, _ := strconv.Atoi(b["count"])
+            b["count"] = strconv.Itoa(count + 1)
+            isPresent = true
+        }
+    }
+    if (isPresent == false) {
+        host := map[string]string{}
+        host["key"] = item
+        host["count"] = "1"
+        list = append(list, host)
+    }
+
+    return list
+}
+
+
+func fetchHandler(w http.ResponseWriter, r *http.Request){
     var (
             urls string
             mindate string
@@ -41,7 +63,6 @@ func Fetchhandler(w http.ResponseWriter, r *http.Request){
 
     if r.Method == "GET" {
         key := r.FormValue("key")
-        fmt.Println(key)
         err := db.QueryRow("select urls, mindate, maxdate from hosts where host=$1", key).Scan(&urls, &mindate, &maxdate)
         switch {
             case err == sql.ErrNoRows:
@@ -51,13 +72,29 @@ func Fetchhandler(w http.ResponseWriter, r *http.Request){
                 log.Fatal(err)
         }
 
-        fmt.Println(urls, mindate, maxdate, len(s.Split(urls, ";")))
+        extns := []map[string]string{}
+
+        // Aggregating counts according to extension
+        for _, url := range s.Split(urls, ";") {
+            extn := s.Split(url, ".")[len(s.Split(url, "."))-1]
+            // check extn length
+            if len(extn) < 4 {
+                extns = checkOrAppend(extn, extns)
+            } else {
+                // probably not extention
+                extns = checkOrAppend("html", extns)
+                fmt.Println(extn)
+            }
+        }
+
+        fmt.Println(extns)
 
         thisHost := &HostData{
             Host: key, 
             Url:  len(s.Split(urls, ";")),
             Mindate: mindate,
             Maxdate: maxdate,
+            UrlCount: extns,
         }
 
         js, err := json.Marshal(thisHost)
@@ -77,11 +114,14 @@ func main() {
     var err error
     db, err = sql.Open("postgres", s.Join(argsWithoutProg," "))
     if  err!= nil {
+       fmt.Println(err)
        log.Fatal(err)
     }
     defer db.Close()
 
     http.HandleFunc("/", handler)
-    http.HandleFunc("/fetch", Fetchhandler)
+    http.HandleFunc("/fetch", fetchHandler)
+    fs := http.FileServer(http.Dir("dist"))
+    http.Handle("/dist/", http.StripPrefix("/dist/", fs))
     http.ListenAndServe(":8081", nil)
 }
