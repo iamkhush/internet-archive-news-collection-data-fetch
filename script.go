@@ -12,6 +12,7 @@ import (
         "html/template"
         "encoding/json"
         "strconv"
+        humanize "github.com/dustin/go-humanize"
 )
 
 var db *sql.DB
@@ -31,7 +32,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
         log.Fatal(err)
     }
     t, _ := template.ParseFiles("index.gtpl")
-    t.Execute(w, rowcount)
+    t.Execute(w, humanize.Comma(rowcount))
 }
 
 func checkOrAppend(item string, list []map[string]string) []map[string]string {

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {BarChart, XAxis, YAxis, Tooltip, Legend} from 'recharts';
+import {BarChart, Bar, XAxis, YAxis, Tooltip, Legend} from 'recharts';
 import Jquery from 'jquery';
 
 var App = React.createClass({    
@@ -19,7 +19,7 @@ var App = React.createClass({
           <div className="container">
             <form action="#" method="GET" onSubmit={this.formSubmit}>
                 <div className="form-group">
-                  <input type="text" name="key" className="form-control" placeholder="Enter the host name." onChange={this.handleChange} />
+                  <input type="text" name="key" className="form-control" placeholder="Enter the host name." onChange={this.handleChange} value={this.state.this_host}/>
                 </div>
                 <button type="submit" className={this.state.fetching?"btn btn-primary disabled":"btn btn-primary"} onClick={this.formSubmit}>Submit <i className={this.state.fetching?"fa fa-spinner fa-spin":""} /></button> 
             </form>
@@ -42,25 +42,29 @@ var App = React.createClass({
                   host.Maxdate.substr(6,2);
                   return (
                     <tr>
-                      <td>{host.Host}</td>
+                      <td><i className="fa fa-times" onClick={this.deleteRow}></i>{host.Host}</td>
                       <td>{host.Url}</td>
                       <td>{min}</td>
                       <td>{max}</td>
                     </tr>
                   )
-                })
+                }.bind(this))
               }
             </tbody>
           </table>
           <BarChart width={600} height={300} data={this.state.data}>
             <XAxis dataKey="key"/>
-            <YAxis dataKey="count" />
+            <YAxis />
             <Tooltip/>
             <Legend />
+            <Bar dataKey="count" />
           </BarChart>
         </div>
       </div>
     );
+  },
+  deleteRow: function(e){
+    this.setState({hosts: [], data:[], this_host:''});
   },
   handleChange: function(e) {
     this.setState({
@@ -75,7 +79,7 @@ var App = React.createClass({
       type: 'GET',
       success: function(data){
         this.setState(function(prevState){
-          modUrlCount = data.UrlCount.map(function(eachDict){
+          var modUrlCount = data.UrlCount.map(function(eachDict){
             eachDict['count'] = parseInt(eachDict['count']);
             return eachDict;
           })

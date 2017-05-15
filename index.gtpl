@@ -17,6 +17,11 @@
         color: white;
         margin-bottom: 20px
       }
+
+      .fa-times {
+        margin-left: -57px;
+        padding-right: 45px;
+      }
     </style>
   </head>
   <body>
