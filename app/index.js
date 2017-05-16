@@ -57,7 +57,7 @@ var App = React.createClass({
             <YAxis />
             <Tooltip/>
             <Legend />
-            <Bar dataKey="count" />
+            <Bar dataKey="count" fill="#0275d8" />
           </BarChart>
         </div>
       </div>
@@ -72,7 +72,7 @@ var App = React.createClass({
     })
   },
   formSubmit: function(event){
-    this.setState({fetching: true});
+    this.setState({fetching: true, hosts: [], data:[]});
     event.preventDefault();
     Jquery.ajax({
       url: '/fetch?key='+ this.state.this_host,

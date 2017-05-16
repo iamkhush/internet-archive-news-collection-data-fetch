@@ -26,7 +26,7 @@ type HostData struct {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-    var rowcount uint64
+    var rowcount int64
     err := db.QueryRow("SELECT reltuples::bigint AS estimate FROM pg_class where relname='hosts'").Scan(&rowcount)
     if err != nil {
         log.Fatal(err)
@@ -77,7 +77,8 @@ func fetchHandler(w http.ResponseWriter, r *http.Request){
 
         // Aggregating counts according to extension
         for _, url := range s.Split(urls, ";") {
-            extn := s.Split(url, ".")[len(s.Split(url, "."))-1]
+            extn := s.Split(url, "?")[len(s.Split(url, "."))-2]
+            extn = s.Split(extn, ".")[len(s.Split(extn, "."))-1]
             // check extn length
             if len(extn) < 4 {
                 extns = checkOrAppend(extn, extns)
