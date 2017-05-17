@@ -64,6 +64,9 @@ func fetchHandler(w http.ResponseWriter, r *http.Request){
 
     if r.Method == "GET" {
         key := r.FormValue("key")
+        key = s.TrimPrefix(key, "http://")
+        key = s.TrimPrefix(key, "https://")
+        key = s.TrimSuffix(key, "/")
         err := db.QueryRow("select urls, mindate, maxdate from hosts where host=$1", key).Scan(&urls, &mindate, &maxdate)
         switch {
             case err == sql.ErrNoRows:
@@ -77,7 +80,12 @@ func fetchHandler(w http.ResponseWriter, r *http.Request){
 
         // Aggregating counts according to extension
         for _, url := range s.Split(urls, ";") {
-            extn := s.Split(url, "?")[len(s.Split(url, "."))-2]
+            var extn string
+            if len(s.Split(url, "?")) >= 2 {
+                extn = s.Split(url, "?")[len(s.Split(url, "?"))-2]
+            } else {
+                extn = s.Split(url, "?")[len(s.Split(url, "?"))-1]  
+            }
             extn = s.Split(extn, ".")[len(s.Split(extn, "."))-1]
             // check extn length
             if len(extn) < 4 {
@@ -85,11 +93,8 @@ func fetchHandler(w http.ResponseWriter, r *http.Request){
             } else {
                 // probably not extention
                 extns = checkOrAppend("html", extns)
-                fmt.Println(extn)
             }
         }
-
-        fmt.Println(extns)
 
         thisHost := &HostData{
             Host: key, 
@@ -104,7 +109,6 @@ func fetchHandler(w http.ResponseWriter, r *http.Request){
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
         }
-        fmt.Println(string(js))
         w.Header().Set("Content-Type", "application/json")
         w.Write(js)
     }

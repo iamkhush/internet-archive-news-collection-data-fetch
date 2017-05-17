@@ -22,6 +22,10 @@
         margin-left: -57px;
         padding-right: 45px;
       }
+
+      .recharts-wrapper {
+        margin-left: 20%;
+      }
     </style>
   </head>
   <body>
